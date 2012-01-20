@@ -30,11 +30,8 @@ object RayWindow extends SimpleSwingApplication {
     override def paintComponent(g: Graphics2D) {
       val dx = g.getClipBounds.width.toFloat / width
       val dy = g.getClipBounds.height.toFloat / height
-      for {
-        x <- pixels.s.indices
-        y <- pixels.s(x).indices
-      } {
-        g.setColor(pixels.s(x)(y))
+      for ( (x, y, c) <- pixels ) {
+        g.setColor(c)
         g.fillRect(x, y, x, y)
       }
     }

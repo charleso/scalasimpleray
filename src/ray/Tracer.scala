@@ -11,6 +11,12 @@ class Tracer() {
     val s = Array.ofDim[java.awt.Color](x, y)
     def apply(x: Int) = s(x)
     def update(x: Int, y: Int, value: java.awt.Color) { s(x)(y) = value }
+    def map[A](f:((Int, Int)) => A) = {
+      for {
+        x <- s.indices
+        y <- s(x).indices
+      } yield f(x, y)
+    }
   }
 
   def computeColor(hitAngle: Double, ray: Ray, sphere: Sphere, light: Light, ambientLight: Light): Int = {
@@ -39,15 +45,12 @@ class Tracer() {
 
   def trace(scene: Scene, width: Int, height: Int) = {
     var screen = new Screen(width, height)
-    for {
-      x <- screen.s.indices
-      y <- screen.s(x).indices
-    } {
+    for ( tup <- screen) yield {
+      val (x, y) = tup
       val ray = Ray(Vector(x, y, -1000), Vector(0, 0, 1).norm)
       val closestSphere = getClosestSphere(ray, scene.objects)
       val finalColor = getObjectColor(scene, closestSphere, ray)
-      screen.s(x)(y) = new Color(finalColor)
+      (x, y, new Color(finalColor))
     }
-    screen
   }
 }
